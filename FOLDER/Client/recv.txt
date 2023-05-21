@@ -1,0 +1,5 @@
+abc.txt?File?D:/DELETE_THIS_FOLDER/abc.txt
+compare.png?File?D:/DELETE_THIS_FOLDER/compare.png
+compareCopy.png?File?D:/DELETE_THIS_FOLDER/compareCopy.png
+TrucZyyy.abc?Folder?D:/DELETE_THIS_FOLDER/TrucZyyy.abc
+	456789?Folder?D:/DELETE_THIS_FOLDER/TrucZyyy.abc/456789

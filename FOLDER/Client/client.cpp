@@ -10,39 +10,50 @@ const int BUFFER_SIZE = 1024;
 
 using namespace std;
 
-void sendConfirm(SOCKET &socket) {
-    int confi = 1;
-    int sen;
-    do {
-        sen = send(socket, reinterpret_cast<char*>(&confi), sizeof(confi), 0);
-    } while (sen == -1);
-}
-
-void recvData(SOCKET& socket, char* mess, int totalByte=1) {
-    int recvByte;
-    int curByte = 0;
-    do {
-        recvByte = recv(socket, mess, BUFFER_SIZE, 0);
-        // curByte += (recvByte < 0 ? 0 : recvByte);
-    } while (recvByte == -1); //(curByte < totalByte);
-}
+// void recvData(SOCKET& socket, char* mess, int totalByte=1) {
+//     int recvByte;
+//     int curByte = 0;
+//     do {
+//         recvByte = recv(socket, mess, BUFFER_SIZE, 0);
+//         // curByte += (recvByte < 0 ? 0 : recvByte);
+//     } while (recvByte == -1); //(curByte < totalByte);
+// }
 
 void recvListFolder(SOCKET &m_socket) {
-    int size;  
-    recvData(m_socket, reinterpret_cast<char*>(&size), sizeof(int));
-    // sendConfirm(m_socket);
-    cout << "size = " << size << "\n";
+    const char* filename = "recv.txt";
+    // Nhan kich thuoc file
+    streampos file_size;
+    int bytes_received;
+    do {
+        bytes_received = recv(m_socket, reinterpret_cast<char*>(&file_size), sizeof(streampos), 0);
+    } while (bytes_received == -1);
+    
+    cout << "size: " << file_size << "\n";
 
-    vector<string> ans;
-    for (int i = 0; i < size; i++) {
-        int length;
-        char mess[BUFFER_SIZE+1];
-        recvData(m_socket, reinterpret_cast<char*>(&length), sizeof(int));
-        cout << length << " - ";
-        recvData(m_socket, mess, length);
-        cout << (string)mess << "\n";
-        // sendConfirm(m_socket);
+    // Tao file anh
+    ofstream out(filename, ios::binary);
+    char* buffer = new char[BUFFER_SIZE];
+    int bytes_read = 0;
+
+    // Nhan file anh
+    while (bytes_read < file_size) {
+        int RECV_BUFF = BUFFER_SIZE;
+        if (RECV_BUFF > (int)file_size - bytes_read)
+            RECV_BUFF = (int)file_size - bytes_read;
+        do {
+            bytes_received = recv(m_socket, buffer, RECV_BUFF, 0);
+        } while(bytes_received == -1);
+
+        out.write(buffer, bytes_received);
+        bytes_read += bytes_received;
+        if (bytes_read == file_size) {
+            break;
+        }
     }
+
+    cout << "Recv: " << bytes_read << "\n";
+    out.close();
+    delete[] buffer;
 }
 
 void ClientSocket() {
