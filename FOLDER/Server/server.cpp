@@ -39,25 +39,41 @@ bool send_data(SOCKET &socket, const char* data, int size) {
 }
 
 void sendListFolder(SOCKET &socket) {
-    cout << "sendListFolder --> Loading\n";
+    const char* filename = "DirectoryManager.txt";
+    // lay danh sach file/folder
     FolderTask* f = new FolderTask;
+    string ans = f->tab_recursive_list_files("D:/DELETE_THIS_FOLDER", 0);
+    
+    // ghi ket qua vao file
+    std::ofstream out(filename);
+    out << ans;
+    out.close();
 
-    auto ans = f->list_files("D:/DELETE_THIS_FOLDER");
-    int size = ans.size();
+    // truyen file qua socket
+    ifstream in(filename, ios::binary | ios::ate);
+    streampos file_size = in.tellg();
+    cout << "size: " << file_size << "\n";
+    in.seekg(0, ios::beg);
 
-    // send length of vector
-    send_data(socket, reinterpret_cast<char*>(&size), sizeof(size));
-    // recvConfirm(socket);
+    char* buffer = new char[BUFFER_SIZE];
+    int bytes_sent = 0;
 
-    // send file/folder list
-    for (auto x: ans) {
-        const char* s = x.c_str();
-        cout << "." << s << ".\n";
-        send_data(socket, s, strlen(s));
-        // recvConfirm(socket);
+    // Gui kich thuoc file den server
+    send(socket, reinterpret_cast<char*>(&file_size), sizeof(streampos), 0);
+
+    // Gui file anh den server
+    while (!in.eof()) {
+        int SEND_BUFF = BUFFER_SIZE;
+        if (SEND_BUFF > (int)file_size - bytes_sent)
+            SEND_BUFF = (int)file_size - bytes_sent;
+        in.read(buffer, SEND_BUFF);
+        bytes_sent = send(socket, buffer, SEND_BUFF, 0);
     }
 
-    delete f;
+    cout << "Send: " << bytes_sent << "\n";
+
+    in.close();
+    delete[] buffer;
 }
 
 void ServerSocket() {

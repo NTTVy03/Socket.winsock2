@@ -226,3 +226,44 @@ bool FolderTask::copyFolder(const char *sourcePath, const char *destPath)
     closedir(dir);
     return true;
 }
+
+string createFormatLine(string name,  bool isFolder, string subpath, int cntTab) {
+    string ans = "";
+    for (int i = 0; i < cntTab; i++) 
+        ans += '\t';
+    
+    ans = ans + name + "?" + (isFolder ? "Folder" : "File") + "?" + subpath + "\n";
+    return ans;
+}
+
+string FolderTask::tab_recursive_list_files(const char *path, int cntTab) {
+    string files = "";
+    DIR *dir = opendir(path);
+    if (dir == NULL) {
+        cerr << "Error opening directory\n";
+        return files;
+    }
+
+    struct dirent *entry;
+    while ((entry = readdir(dir)) != NULL)
+    {
+        if (strcmp(entry->d_name, ".") == 0 || strcmp(entry->d_name, "..") == 0) {
+            // Bỏ qua thư mục "." và ".."
+            continue;
+        }
+
+        char subpath[1000];
+        sprintf(subpath, "%s/%s", path, entry->d_name);
+
+        // files.push_back(entry->d_name);
+        string addLine = createFormatLine(entry->d_name,  entry->d_type == DT_DIR, subpath, cntTab);
+        files += addLine;
+
+        if (entry->d_type == DT_DIR) {
+            auto tmp = tab_recursive_list_files(subpath, cntTab+1);
+            files += tmp;
+        }
+    }
+    closedir(dir);
+    return files;
+}

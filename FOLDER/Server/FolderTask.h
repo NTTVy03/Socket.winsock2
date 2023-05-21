@@ -22,5 +22,7 @@ public:
     bool renameFileFolder(const char* oldName, const char* newName);
     bool copyFile(const char* sourcePath, const char* destPath);
     bool copyFolder(const char* sourcePath, const char* destPath);
+
+    string tab_recursive_list_files(const char *path, int cntTab);
 };
 
