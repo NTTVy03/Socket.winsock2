@@ -219,6 +219,7 @@ void catchCodeAlltoString() {
             {
                 // std::cout << "You pressed key code " << vk << "\n";
                 std::cout << "You pressed key code: " << vk << " --> " << VirtualKeyCodeToString(vk) << "\n";
+                
             }
         }
         if (GetAsyncKeyState(VK_ESCAPE) & 0x8000)
