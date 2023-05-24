@@ -161,7 +161,7 @@ void ServerSocket() {
 
 void test() {
     FolderTask *f = new FolderTask();
-    string ans = f->tab_recursive_list_files("D:/", 0);
+    string ans = f->tab_recursive_list_files("D:/DELETE_THIS_FOLDER", 0);
     cout << ans;
 
     // cout << f->isFolder("D:/HK2_NAM2/BUCHA/quanLyCongViec.xlsx") << "\n";
